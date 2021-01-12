@@ -1,81 +1,159 @@
-function getElement(className) {
-  const el = document.getElementsByClassName(className)[0];
-  if (!el) {
-    throw new Error(`.${className} not found`);
-  }
-  return el;
+const canvas = document.getElementById("myCanvas");
+const ctx = canvas.getContext("2d");
+
+function getRandomArbitrary(min, max) {
+  return Math.floor(Math.random() * (max - min) + min);
 }
 
-const main = () => {
-  console.log("x");
+function getRandomPos() {
+  return new Pos(getRandomArbitrary(1, 500), getRandomArbitrary(1, 500));
+}
 
-  const canvas = getElement("canvas");
+function drawCircle(pos, color) {
+  ctx.beginPath();
+  ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  ctx.closePath();
+}
 
-  const ctx = canvas.getContext("2d");
-
-  ctx.fillStyle = "black";
-  ctx.fillRect(100, 100, 1, 1);
-};
-
-function main2() {
-  console.log("y");
-
-  var canvas = document.getElementById("myCanvas");
-  var ctx = canvas.getContext("2d");
-  //   var x = canvas.width / 2;
-  //   var y = canvas.height - 30;
-  var dx = 0.1;
-  var dy = -0.2;
-
-  const world = [];
-  world.push({ x: 100, y: 100, color: "yellow" });
-  world.push({ x: 50, y: 50, color: "green" });
-
-  function drawBall(x, y, color) {
-    ctx.beginPath();
-    ctx.arc(x, y, 5, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.closePath();
+class Pos {
+  constructor(x, y) {
+    this.vector = new Vector(x, y);
   }
 
-  function tick() {
-    const yellow = world[0];
-    const green = world[1];
+  get x() {
+    return this.vector["0"];
+  }
 
-    const diffX = green.x - yellow.x;
-    const diffY = green.y - yellow.y;
+  get y() {
+    return this.vector["1"];
+  }
 
-    console.log(diffX, diffY);
-    if (Math.abs(diffX) > Math.abs(diffY)) {
-      console.log("x");
-      green.x += diffX > 0 ? -1 : 1;
+  set x(value) {
+    this.vector = new Vector(value, this.y);
+  }
+
+  set y(value) {
+    this.vector = new Vector(this.x, value);
+  }
+
+  equal(pos) {
+    return this.x === pos.x && this.y === pos.y;
+  }
+}
+
+class Person {
+  constructor(pos, world) {
+    this.pos = pos;
+    this.world = world;
+  }
+
+  setHome(home) {
+    this.home = home;
+  }
+
+  tick() {
+    if (this.target) {
+      if (this.pos.equal(this.target.pos)) {
+        this.world.remove(this.target);
+        this.target = undefined;
+      } else {
+        this.moveTowards(this.target);
+      }
     } else {
-      console.log("y");
-      green.y += diffY > 0 ? -1 : 1;
+      this.target = this.world.find(Apple);
     }
-
-    yellow.y += 0.5;
-    // for (const obj of world) {
-    //   if (obj.color === "yellow") {
-    //     obj.y += 1;
-    //   }
-
-    //   if (obj.color === "green") {
-    //     obj.y += 1;
-    //   }
-    // }
   }
 
-  function draw() {
+  moveTowards(target) {
+    const diffX = this.pos.x - target.pos.x;
+    const diffY = this.pos.y - target.pos.y;
+
+    if (Math.abs(diffX) > Math.abs(diffY)) {
+      this.pos.x += diffX > 0 ? -1 : 1;
+    } else {
+      this.pos.y += diffY > 0 ? -1 : 1;
+    }
+  }
+
+  draw() {
+    drawCircle(this.pos, "blue");
+  }
+}
+
+class Apple {
+  constructor(pos) {
+    this.pos = pos;
+  }
+
+  draw() {
+    drawCircle(this.pos, "green");
+  }
+}
+
+class Home {
+  constructor(pos) {
+    this.pos = pos;
+  }
+
+  draw() {
+    drawCircle(this.pos, "black");
+  }
+}
+
+class World {
+  constructor() {
+    this.objects = [];
+  }
+
+  find(type) {
+    return this.objects.find((o) => o.constructor === type);
+  }
+
+  remove(obj) {
+    this.objects = this.objects.filter((o) => o !== obj);
+  }
+
+  tick() {
+    for (const obj of this.objects) {
+      if (obj.tick) {
+        obj.tick();
+      }
+    }
+  }
+
+  draw() {
+    for (const obj of this.objects) {
+      obj.draw();
+    }
+  }
+}
+
+function addApple(world) {
+  const x = getRandomArbitrary(1, 500);
+  const y = getRandomArbitrary(1, 500);
+  const apple = new Apple(getRandomPos());
+  world.objects.push(apple);
+  setTimeout(() => addApple(world), getRandomArbitrary(0.5, 3) * 1000);
+}
+
+function main() {
+  const world = new World();
+  const home = new Home(new Pos(50, 50));
+  const person = new Person(new Pos(50, 50), world);
+  person.setHome(home);
+
+  world.objects.push(person);
+  world.objects.push(home);
+
+  function renderLoop() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (const obj of world) {
-      drawBall(obj.x, obj.y, obj.color);
-    }
-    tick();
-    requestAnimationFrame(draw);
+    world.tick();
+    world.draw();
+    requestAnimationFrame(renderLoop);
   }
 
-  draw();
+  renderLoop();
+  addApple(world);
 }
