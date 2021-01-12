@@ -47,6 +47,7 @@ class Person {
   constructor(pos, world) {
     this.pos = pos;
     this.world = world;
+    this.inventory = undefined;
   }
 
   setHome(home) {
@@ -56,8 +57,7 @@ class Person {
   tick() {
     if (this.target) {
       if (this.pos.equal(this.target.pos)) {
-        this.world.remove(this.target);
-        this.target = undefined;
+        this.targetReached(this.target);
       } else {
         this.moveTowards(this.target);
       }
@@ -79,6 +79,22 @@ class Person {
 
   draw() {
     drawCircle(this.pos, "blue");
+  }
+
+  targetReached(target) {
+    switch (target.constructor) {
+      case Apple: {
+        this.inventory = this.target;
+        this.world.remove(this.target);
+        this.target = this.world.find(Home);
+        break;
+      }
+
+      case Home: {
+        this.inventory = undefined;
+        this.target = this.world.find(Apple);
+      }
+    }
   }
 }
 
