@@ -1,17 +1,20 @@
 const canvas = document.getElementById("myCanvas");
 const ctx = canvas.getContext("2d");
 
+const WIDTH = 200;
+const HEIGHT = 200;
+
 function getRandomArbitrary(min, max) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
 function getRandomPos() {
-  return new Pos(getRandomArbitrary(1, 500), getRandomArbitrary(1, 500));
+  return new Pos(getRandomArbitrary(1, WIDTH), getRandomArbitrary(1, HEIGHT));
 }
 
-function drawCircle(pos, color) {
+function drawCircle(pos, color, radius) {
   ctx.beginPath();
-  ctx.arc(pos.x, pos.y, 5, 0, Math.PI * 2);
+  ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
   ctx.closePath();
@@ -75,10 +78,17 @@ class Person {
     } else {
       this.pos.y += diffY > 0 ? -1 : 1;
     }
+
+    if (this.inventory) {
+      this.inventory.pos = this.pos;
+    }
   }
 
   draw() {
-    drawCircle(this.pos, "blue");
+    drawCircle(this.pos, "lightblue", 12);
+    if (this.inventory) {
+      this.inventory.draw();
+    }
   }
 
   targetReached(target) {
@@ -104,7 +114,7 @@ class Apple {
   }
 
   draw() {
-    drawCircle(this.pos, "green");
+    drawCircle(this.pos, "green", 5);
   }
 }
 
@@ -114,7 +124,7 @@ class Home {
   }
 
   draw() {
-    drawCircle(this.pos, "black");
+    drawCircle(this.pos, "black", 5);
   }
 }
 
@@ -147,8 +157,6 @@ class World {
 }
 
 function addApple(world) {
-  const x = getRandomArbitrary(1, 500);
-  const y = getRandomArbitrary(1, 500);
   const apple = new Apple(getRandomPos());
   world.objects.push(apple);
   setTimeout(() => addApple(world), getRandomArbitrary(0.5, 3) * 1000);
