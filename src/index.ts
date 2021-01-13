@@ -1,7 +1,7 @@
 const WIDTH = 200;
 const HEIGHT = 200;
 
-function getRandomArbitrary(min, max) {
+function getRandomArbitrary(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
@@ -9,16 +9,30 @@ function getRandomPos() {
   return new Pos(getRandomArbitrary(1, WIDTH), getRandomArbitrary(1, HEIGHT));
 }
 
-function chunkArray(array, chunkSize) {
-  return [].concat.apply(
-    [],
-    array.map(function (elem, i) {
-      return i % chunkSize ? [] : [array.slice(i, i + chunkSize)];
-    })
-  );
+function chunkArray<T>(sourceArray: T[], chunkSize: number): T[][] {
+  let innerArray = [];
+  const outerArray = [];
+
+  for (const el of sourceArray) {
+    innerArray.push(el);
+    if (innerArray.length === chunkSize) {
+      outerArray.push(innerArray);
+      innerArray = [];
+    }
+  }
+  if (innerArray.length !== chunkSize) {
+    outerArray.push(innerArray);
+  }
+
+  return outerArray;
 }
 
-function drawCircle(ctx, pos, color, radius) {
+function drawCircle(
+  ctx: CanvasRenderingContext2D,
+  pos: Pos,
+  color: string,
+  radius: number
+) {
   ctx.beginPath();
   ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
   ctx.fillStyle = color;
@@ -26,34 +40,44 @@ function drawCircle(ctx, pos, color, radius) {
   ctx.closePath();
 }
 
-function drawRect(ctx, pos, color, size) {
+function drawRect(
+  ctx: CanvasRenderingContext2D,
+  pos: Pos,
+  color: string,
+  size: number
+) {
   ctx.fillStyle = color;
   const s = size / 2;
   ctx.fillRect(pos.x - s, pos.y - s, size, size);
 }
 
 class Pos {
-  constructor(x, y) {
+  constructor(x: number, y: number) {
+    // @ts-ignore
     this.vector = new Vector(x, y);
   }
 
-  get x() {
+  get x(): number {
+    // @ts-ignore
     return this.vector["0"];
   }
 
-  get y() {
+  get y(): number {
+    // @ts-ignore
     return this.vector["1"];
   }
 
   set x(value) {
+    // @ts-ignore
     this.vector = new Vector(value, this.y);
   }
 
   set y(value) {
+    // @ts-ignore
     this.vector = new Vector(this.x, value);
   }
 
-  equals(pos) {
+  equals(pos: Pos) {
     return this.x === pos.x && this.y === pos.y;
   }
 
@@ -62,17 +86,38 @@ class Pos {
   }
 }
 
-class Person {
-  radius = 12;
+type Hitbox = {
+  x: [number, number];
+  y: [number, number];
+};
 
-  constructor(pos, world) {
+interface Object {
+  pos: Pos;
+  tick(): void;
+  draw(ctx: CanvasRenderingContext2D): void;
+  getHitbox(): Hitbox | void;
+}
+
+type ObjectType = typeof Person | typeof Apple | typeof House;
+
+class Person implements Object {
+  radius = 12;
+  pos: Pos;
+  world: World;
+  inventory: undefined | Object;
+  target: { pos: Pos; type: ObjectType } | undefined;
+
+  constructor(pos: Pos, world: World) {
     this.pos = pos;
     this.world = world;
     this.inventory = undefined;
   }
 
-  setTarget(pos, type) {
-    this.target = { pos, type };
+  setTarget(type: ObjectType) {
+    const pos = this.world.findPos(type);
+    if (pos) {
+      this.target = { pos, type };
+    }
   }
 
   tick() {
@@ -80,16 +125,19 @@ class Person {
       if (this.pos.equals(this.target.pos)) {
         this.targetReached();
       } else {
-        this.moveTowards(this.target);
+        this.moveTowards();
       }
     } else {
-      this.setTarget(this.world.findPos(Apple), Apple);
+      this.setTarget(Apple);
     }
   }
 
-  moveTowards(target) {
-    const diffX = this.pos.x - target.pos.x;
-    const diffY = this.pos.y - target.pos.y;
+  moveTowards() {
+    if (!this.target) {
+      return;
+    }
+    const diffX = this.pos.x - this.target.pos.x;
+    const diffY = this.pos.y - this.target.pos.y;
 
     if (Math.abs(diffX) > Math.abs(diffY)) {
       this.pos.x += diffX > 0 ? -1 : 1;
@@ -102,7 +150,7 @@ class Person {
     }
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     drawCircle(ctx, this.pos, "lightblue", this.radius);
     if (this.inventory) {
       this.inventory.draw(ctx);
@@ -110,15 +158,15 @@ class Person {
   }
 
   targetReached() {
-    switch (this.target.type) {
+    switch (this.target?.type) {
       case Apple: {
         const apple = this.world.takeObject(Apple, this.target.pos);
         if (apple) {
           this.inventory = apple;
-          this.setTarget(this.world.findPos(House), House);
+          this.setTarget(House);
         } else {
           // Someone else must have picked up the apple; let's find a new one
-          this.setTarget(this.world.findPos(Apple), Apple);
+          this.setTarget(Apple);
         }
         break;
       }
@@ -126,7 +174,7 @@ class Person {
       case House: {
         this.world.interact(House, this.pos, "addToStore", [this.inventory]);
         this.inventory = undefined;
-        this.setTarget(this.world.findPos(Apple), Apple);
+        this.setTarget(Apple);
         break;
       }
     }
@@ -136,33 +184,35 @@ class Person {
   }
 }
 
-class Apple {
+class Apple implements Object {
   radius = 5;
-  constructor(pos) {
+  constructor(pos: Pos) {
     this.pos = pos;
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     drawCircle(ctx, this.pos, "green", this.radius);
   }
 
   getHitbox() {
-    return {
+    const h: Hitbox = {
       x: [this.pos.x - this.radius, this.pos.x + this.radius],
       y: [this.pos.y - this.radius, this.pos.y + this.radius],
     };
+    return h;
   }
 }
 
-class House {
+class House implements Object {
   size = 70;
+  store: Object[];
 
-  constructor(pos) {
+  constructor(pos: Pos) {
     this.pos = pos;
     this.store = [];
   }
 
-  draw(ctx) {
+  draw(ctx: CanvasRenderingContext2D) {
     drawRect(ctx, this.pos, "black", this.size);
 
     const rows = chunkArray(this.store, 3);
@@ -177,27 +227,31 @@ class House {
     });
   }
 
-  addToStore(obj) {
+  addToStore(obj: Object) {
     this.store.push(obj);
   }
 
   getHitbox() {
     const halfSize = this.size / 2;
-    return {
+    const h: Hitbox = {
       x: [this.pos.x - halfSize, this.pos.x + halfSize],
       y: [this.pos.y - halfSize, this.pos.y + halfSize],
     };
+    return h;
   }
 }
 
 class World {
-  constructor(ctx1, ctx2) {
+  ctx1: CanvasRenderingContext2D;
+  ctx2: CanvasRenderingContext2D;
+  objects: Object[];
+  constructor(ctx1: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D) {
     this.ctx1 = ctx1;
     this.ctx2 = ctx2;
     this.objects = [];
   }
 
-  objectCollides(objA) {
+  objectCollides(objA: Object) {
     const hitboxA = objA.getHitbox();
     if (!hitboxA) {
       return false;
@@ -224,13 +278,13 @@ class World {
     return false;
   }
 
-  _findAt(type, pos) {
+  _findAt(type: ObjectType, pos: Pos) {
     return this.objects.find(
-      (obj) => obj.constructor === type && obj.pos.equals(pos)
+      (obj) => obj.pos.equals(pos) && obj.constructor === type
     );
   }
 
-  add(obj) {
+  add(obj: Object) {
     if (this.objectCollides(obj)) {
       return false;
     } else {
@@ -239,13 +293,13 @@ class World {
     }
   }
 
-  findPos(type) {
+  findPos(type: ObjectType) {
     const objects = this.objects.filter((o) => o.constructor === type);
     const obj = objects[Math.floor(Math.random() * objects.length)];
     return obj ? obj.pos : undefined;
   }
 
-  takeObject(type, pos) {
+  takeObject(type: ObjectType, pos: Pos) {
     const obj = this._findAt(type, pos);
     if (!obj) {
       return undefined;
@@ -254,8 +308,13 @@ class World {
     return obj;
   }
 
-  interact(type, pos, method, params) {
-    this._findAt(type, pos)[method](...params);
+  interact(type: ObjectType, pos: Pos, method: string, params: any[]) {
+    const obj = this._findAt(type, pos);
+    if (!obj) {
+      return false;
+    }
+    // @ts-ignore
+    obj[method](...params);
   }
 
   tick() {
@@ -273,7 +332,7 @@ class World {
   }
 }
 
-function addAppleAddRandomPos(world) {
+function addAppleAddRandomPos(world: World) {
   let counter = 0;
   while (true) {
     const apple = new Apple(getRandomPos());
@@ -287,16 +346,16 @@ function addAppleAddRandomPos(world) {
   }
 }
 
-function addApples(world) {
+function addApples(world: World) {
   addAppleAddRandomPos(world);
   setTimeout(() => addApples(world), getRandomArbitrary(1, 3) * 1000);
 }
 
 function main() {
-  const canvas1 = document.getElementById("myCanvas1");
-  const ctx1 = canvas1.getContext("2d");
-  const canvas2 = document.getElementById("myCanvas2");
-  const ctx2 = canvas2.getContext("2d");
+  const canvas1 = document.getElementById("myCanvas1") as HTMLCanvasElement;
+  const ctx1 = canvas1.getContext("2d") as CanvasRenderingContext2D;
+  const canvas2 = document.getElementById("myCanvas2") as HTMLCanvasElement;
+  const ctx2 = canvas2.getContext("2d") as CanvasRenderingContext2D;
 
   const world = new World(ctx1, ctx2);
   const home = new House(new Pos(50, 50));
