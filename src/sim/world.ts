@@ -2,6 +2,8 @@ import House from './house.js'
 import Pos from './pos.js'
 import { ObjectType, Object1 } from '../types.js'
 
+const DRAW_HITBOXES = false
+
 class World {
   ctx1: CanvasRenderingContext2D
   ctx2: CanvasRenderingContext2D
@@ -94,6 +96,19 @@ class World {
   draw() {
     for (const obj of this.objects) {
       obj.draw(obj.constructor === House ? this.ctx1 : this.ctx2)
+
+      if (DRAW_HITBOXES) {
+        const hi = obj.getHitbox()
+        if (hi) {
+          this.ctx2.fillStyle = 'orange'
+          this.ctx2.fillRect(
+            hi.x[0],
+            hi.y[0],
+            hi.x[1] - hi.x[0],
+            hi.y[1] - hi.y[0],
+          )
+        }
+      }
     }
   }
 
