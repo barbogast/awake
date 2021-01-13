@@ -9,6 +9,7 @@
   },
   "scripts": {
     "tsc": "tsc",
+    "serve": "(cd public && python -m SimpleHTTPServer 8080)",
     "watch": "tsc --watch"
   }
 }
