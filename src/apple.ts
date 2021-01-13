@@ -26,6 +26,10 @@ class Apple implements Object1 {
     }
     return h
   }
+
+  debugInfo() {
+    return `Apple ${this.id}`
+  }
 }
 
 export default Apple

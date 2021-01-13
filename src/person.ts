@@ -89,8 +89,16 @@ class Person implements Object1 {
       }
     }
   }
+
   getHitbox() {
     return undefined
+  }
+
+  debugInfo() {
+    return {
+      id: this.id,
+      inventory: this.inventory ? this.inventory.debugInfo() : 'empty',
+    }
   }
 }
 

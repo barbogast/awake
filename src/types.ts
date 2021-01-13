@@ -10,6 +10,7 @@ export interface Object1 {
   tick?(): void
   draw(ctx: CanvasRenderingContext2D): void
   getHitbox(): Hitbox | void
+  debugInfo(): any
 }
 
 export type ObjectType = typeof Person | typeof Apple | typeof House

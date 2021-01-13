@@ -15,6 +15,7 @@ class House implements Object1 {
 
   setId(id: string) {
     this.id = id
+  }
 
   draw(ctx: CanvasRenderingContext2D) {
     drawRect(ctx, this.pos, 'black', this.size)
@@ -42,6 +43,10 @@ class House implements Object1 {
       y: [this.pos.y - halfSize, this.pos.y + halfSize],
     }
     return h
+  }
+
+  debugInfo() {
+    return { id: this.id, store: this.store.map((obj) => obj.debugInfo()) }
   }
 }
 
