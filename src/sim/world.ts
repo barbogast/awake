@@ -29,13 +29,13 @@ class World {
 
       const aRightOfB = hitboxB.x[1] < hitboxA.x[0]
       const bRightOfA = hitboxA.x[1] < hitboxB.x[0]
-      if (!(aRightOfB || bRightOfA)) {
-        return true
-      }
+      const xOverlaps = !(aRightOfB || bRightOfA)
 
       const aBelowB = hitboxB.y[1] < hitboxA.y[0]
       const bBelowA = hitboxA.y[1] < hitboxB.y[0]
-      if (!(aBelowB || bBelowA)) {
+      const yOverlaps = !(aBelowB || bBelowA)
+
+      if (xOverlaps && yOverlaps) {
         return true
       }
     }
