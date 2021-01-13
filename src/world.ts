@@ -96,6 +96,18 @@ class World {
       obj.draw(obj.constructor === House ? this.ctx1 : this.ctx2)
     }
   }
+
+  getObjectsByType() {
+    const objByType: { [key: string]: Object1[] } = {
+      Apple: [],
+      House: [],
+      Person: [],
+    }
+    for (const obj of this.objects) {
+      objByType[obj.constructor.name].push(obj)
+    }
+    return objByType
+  }
 }
 
 export default World
