@@ -4,5 +4,11 @@
   "main": "index.js",
   "author": "Benjamin Arbogast <benjamin.arbogast@gmail.com>",
   "license": "MIT",
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "^4.1.3"
+  },
+  "scripts": {
+    "tsc": "tsc",
+    "watch": "tsc --watch"
+  }
 }
