@@ -4,23 +4,7 @@ import Person from "./person.js";
 import Pos from "./pos.js";
 import World from "./world.js";
 import { getRandomArbitrary, getRandomPos } from "./utils.js";
-
-export const WIDTH = 200;
-export const HEIGHT = 200;
-
-export type Hitbox = {
-  x: [number, number];
-  y: [number, number];
-};
-
-export interface Object {
-  pos: Pos;
-  tick?(): void;
-  draw(ctx: CanvasRenderingContext2D): void;
-  getHitbox(): Hitbox | void;
-}
-
-export type ObjectType = typeof Person | typeof Apple | typeof House;
+import { HEIGHT, WIDTH } from "./constants.js";
 
 function addAppleAddRandomPos(world: World) {
   let counter = 0;

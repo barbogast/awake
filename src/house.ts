@@ -1,5 +1,5 @@
 import Pos from "./pos.js";
-import { Hitbox, Object } from "./index.js";
+import { Hitbox, Object } from "./types.js";
 import { chunkArray, drawRect } from "./utils.js";
 
 class House implements Object {

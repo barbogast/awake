@@ -2,7 +2,7 @@ import Apple from "./apple.js";
 import House from "./house.js";
 import Pos from "./pos.js";
 import World from "./world.js";
-import { ObjectType, Object } from "./index.js";
+import { ObjectType, Object } from "./types.js";
 import { drawCircle } from "./utils.js";
 
 class Person implements Object {
