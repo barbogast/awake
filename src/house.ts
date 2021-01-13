@@ -1,3 +1,7 @@
+import Pos from "./pos.js";
+import { Hitbox, Object } from "./index.js";
+import { chunkArray, drawRect } from "./utils.js";
+
 class House implements Object {
   size = 70;
   store: Object[];
@@ -6,6 +10,7 @@ class House implements Object {
     this.pos = pos;
     this.store = [];
   }
+  pos: Pos;
 
   draw(ctx: CanvasRenderingContext2D) {
     drawRect(ctx, this.pos, "black", this.size);
@@ -35,3 +40,5 @@ class House implements Object {
     return h;
   }
 }
+
+export default House;

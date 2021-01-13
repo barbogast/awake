@@ -1,19 +1,26 @@
-const WIDTH = 200;
-const HEIGHT = 200;
+import Apple from "./apple.js";
+import House from "./house.js";
+import Person from "./person.js";
+import Pos from "./pos.js";
+import World from "./world.js";
+import { getRandomArbitrary, getRandomPos } from "./utils.js";
 
-type Hitbox = {
+export const WIDTH = 200;
+export const HEIGHT = 200;
+
+export type Hitbox = {
   x: [number, number];
   y: [number, number];
 };
 
-interface Object {
+export interface Object {
   pos: Pos;
-  tick(): void;
+  tick?(): void;
   draw(ctx: CanvasRenderingContext2D): void;
   getHitbox(): Hitbox | void;
 }
 
-type ObjectType = typeof Person | typeof Apple | typeof House;
+export type ObjectType = typeof Person | typeof Apple | typeof House;
 
 function addAppleAddRandomPos(world: World) {
   let counter = 0;
@@ -60,3 +67,5 @@ function main() {
   renderLoop();
   addApples(world);
 }
+
+main();

@@ -1,12 +1,15 @@
-function getRandomArbitrary(min: number, max: number) {
+import Pos from "./pos.js";
+import { HEIGHT, WIDTH } from "./index.js";
+
+export function getRandomArbitrary(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min);
 }
 
-function getRandomPos() {
+export function getRandomPos() {
   return new Pos(getRandomArbitrary(1, WIDTH), getRandomArbitrary(1, HEIGHT));
 }
 
-function chunkArray<T>(sourceArray: T[], chunkSize: number): T[][] {
+export function chunkArray<T>(sourceArray: T[], chunkSize: number): T[][] {
   let innerArray = [];
   const outerArray = [];
 
@@ -24,7 +27,7 @@ function chunkArray<T>(sourceArray: T[], chunkSize: number): T[][] {
   return outerArray;
 }
 
-function drawCircle(
+export function drawCircle(
   ctx: CanvasRenderingContext2D,
   pos: Pos,
   color: string,
@@ -37,7 +40,7 @@ function drawCircle(
   ctx.closePath();
 }
 
-function drawRect(
+export function drawRect(
   ctx: CanvasRenderingContext2D,
   pos: Pos,
   color: string,

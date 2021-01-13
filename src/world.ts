@@ -1,3 +1,7 @@
+import House from "./house.js";
+import Pos from "./pos.js";
+import { ObjectType, Object } from "./index.js";
+
 class World {
   ctx1: CanvasRenderingContext2D;
   ctx2: CanvasRenderingContext2D;
@@ -88,3 +92,5 @@ class World {
     }
   }
 }
+
+export default World;

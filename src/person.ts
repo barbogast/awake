@@ -1,3 +1,10 @@
+import Apple from "./apple.js";
+import House from "./house.js";
+import Pos from "./pos.js";
+import World from "./world.js";
+import { ObjectType, Object } from "./index.js";
+import { drawCircle } from "./utils.js";
+
 class Person implements Object {
   radius = 12;
   pos: Pos;
@@ -81,3 +88,5 @@ class Person implements Object {
     return undefined;
   }
 }
+
+export default Person;

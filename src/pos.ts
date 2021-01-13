@@ -32,3 +32,5 @@ class Pos {
     return new Pos(this.x, this.y);
   }
 }
+
+export default Pos;

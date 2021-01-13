@@ -1,5 +1,10 @@
+import Pos from "./pos.js";
+import { Hitbox, Object } from "index.js";
+import { drawCircle } from "./utils.js";
+
 class Apple implements Object {
   radius = 5;
+  pos: Pos;
   constructor(pos: Pos) {
     this.pos = pos;
   }
@@ -16,3 +21,5 @@ class Apple implements Object {
     return h;
   }
 }
+
+export default Apple;
