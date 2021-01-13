@@ -11,5 +11,10 @@
     "tsc": "tsc",
     "serve": "(cd public && python -m SimpleHTTPServer 8080)",
     "watch": "tsc --watch"
+  },
+  "prettier": {
+    "trailingComma": "all",
+    "singleQuote": true,
+    "semi": false
   }
 }

@@ -1,44 +1,44 @@
-import Pos from "./pos.js";
-import { Hitbox, Object } from "./types.js";
-import { chunkArray, drawRect } from "./utils.js";
+import Pos from './pos.js'
+import { Hitbox, Object } from './types.js'
+import { chunkArray, drawRect } from './utils.js'
 
 class House implements Object {
-  size = 70;
-  store: Object[];
+  size = 70
+  store: Object[]
 
   constructor(pos: Pos) {
-    this.pos = pos;
-    this.store = [];
+    this.pos = pos
+    this.store = []
   }
-  pos: Pos;
+  pos: Pos
 
   draw(ctx: CanvasRenderingContext2D) {
-    drawRect(ctx, this.pos, "black", this.size);
+    drawRect(ctx, this.pos, 'black', this.size)
 
-    const rows = chunkArray(this.store, 3);
+    const rows = chunkArray(this.store, 3)
     rows.forEach((row, i) => {
-      const y = this.pos.y - 12.5 + i * 15;
+      const y = this.pos.y - 12.5 + i * 15
       row.forEach((obj, i) => {
-        const x = this.pos.x - 12.5 + i * 15;
-        obj.pos.x = x;
-        obj.pos.y = y;
-        obj.draw(ctx);
-      });
-    });
+        const x = this.pos.x - 12.5 + i * 15
+        obj.pos.x = x
+        obj.pos.y = y
+        obj.draw(ctx)
+      })
+    })
   }
 
   addToStore(obj: Object) {
-    this.store.push(obj);
+    this.store.push(obj)
   }
 
   getHitbox() {
-    const halfSize = this.size / 2;
+    const halfSize = this.size / 2
     const h: Hitbox = {
       x: [this.pos.x - halfSize, this.pos.x + halfSize],
       y: [this.pos.y - halfSize, this.pos.y + halfSize],
-    };
-    return h;
+    }
+    return h
   }
 }
 
-export default House;
+export default House
