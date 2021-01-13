@@ -5,12 +5,16 @@ import { chunkArray, drawRect } from './utils.js'
 class House implements Object1 {
   size = 70
   store: Object1[]
+  id!: string
+  pos: Pos
 
   constructor(pos: Pos) {
     this.pos = pos
     this.store = []
   }
-  pos: Pos
+
+  setId(id: string) {
+    this.id = id
 
   draw(ctx: CanvasRenderingContext2D) {
     drawRect(ctx, this.pos, 'black', this.size)

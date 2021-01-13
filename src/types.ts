@@ -5,6 +5,8 @@ import Pos from './pos'
 
 export interface Object1 {
   pos: Pos
+  id: string
+  setId(id: string): void
   tick?(): void
   draw(ctx: CanvasRenderingContext2D): void
   getHitbox(): Hitbox | void

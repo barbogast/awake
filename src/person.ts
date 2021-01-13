@@ -11,11 +11,16 @@ class Person implements Object1 {
   world: World
   inventory: undefined | Object1
   target: { pos: Pos; type: ObjectType } | undefined
+  id!: string
 
   constructor(pos: Pos, world: World) {
     this.pos = pos
     this.world = world
     this.inventory = undefined
+  }
+
+  setId(id: string) {
+    this.id = id
   }
 
   setTarget(type: ObjectType) {

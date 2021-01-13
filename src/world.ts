@@ -6,10 +6,13 @@ class World {
   ctx1: CanvasRenderingContext2D
   ctx2: CanvasRenderingContext2D
   objects: Object1[]
+  counter: number
+
   constructor(ctx1: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D) {
     this.ctx1 = ctx1
     this.ctx2 = ctx2
     this.objects = []
+    this.counter = 0
   }
 
   objectCollides(objA: Object1) {
@@ -49,6 +52,8 @@ class World {
     if (this.objectCollides(obj)) {
       return false
     } else {
+      obj.setId(String(this.counter))
+      this.counter += 1
       this.objects.push(obj)
       return true
     }

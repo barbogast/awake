@@ -5,8 +5,14 @@ import { drawCircle } from './utils.js'
 class Apple implements Object1 {
   radius = 5
   pos: Pos
+  id!: string
+
   constructor(pos: Pos) {
     this.pos = pos
+  }
+
+  setId(id: string) {
+    this.id = id
   }
 
   draw(ctx: CanvasRenderingContext2D) {
