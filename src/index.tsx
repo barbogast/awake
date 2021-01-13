@@ -14,6 +14,10 @@ import { HEIGHT, WIDTH } from './constants.js'
 function addAppleAddRandomPos(world: World) {
   let counter = 0
   while (true) {
+    if (world.getObjectsByType().Apple.length >= 20) {
+      return
+    }
+
     const apple = new Apple(getRandomPos())
     if (world.add(apple)) {
       return
