@@ -34,6 +34,8 @@ class House implements Object1 {
 
   addToStore(obj: Object1) {
     this.store.push(obj)
+    const isFull = this.store.length === 9
+    return isFull
   }
 
   getHitbox() {

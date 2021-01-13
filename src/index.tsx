@@ -10,15 +10,23 @@ import Dashboard from './dashboard.js'
 
 import { getRandomArbitrary, getRandomPos } from './sim/utils.js'
 import { HEIGHT, WIDTH } from './constants.js'
+import Pear from './sim/pear.js'
 
 function addAppleAddRandomPos(world: World) {
   let counter = 0
   while (true) {
-    if (world.getObjectsByType().Apple.length >= 20) {
+    const fruits = world.getObjectsByType()
+    if (fruits.Apple && fruits.Apple.length >= 20) {
       return
     }
 
-    const apple = new Apple(getRandomPos())
+    let Fruit
+    if (getRandomArbitrary(0, 2)) {
+      Fruit = Apple
+    } else {
+      Fruit = Pear
+    }
+    const apple = new Fruit(getRandomPos())
     if (world.add(apple)) {
       return
     }

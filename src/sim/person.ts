@@ -4,6 +4,7 @@ import Pos from './pos.js'
 import World from './world.js'
 import { ObjectType, Object1 } from '../types.js'
 import { drawCircle } from './utils.js'
+import Pear from './pear.js'
 
 class Person implements Object1 {
   radius = 12
@@ -23,22 +24,24 @@ class Person implements Object1 {
     this.id = id
   }
 
-  setTarget(type: ObjectType) {
-    const pos = this.world.findPos(type)
-    if (pos) {
-      this.target = { pos, type }
+  setTarget(types: ObjectType[]) {
+    const target = this.world.findPos(types)
+    if (target) {
+      this.target = target
+    } else {
+      this.target = undefined
     }
   }
 
   tick() {
-    if (this.target?.pos) {
+    if (this.target) {
       if (this.pos.equals(this.target.pos)) {
         this.targetReached()
       } else {
         this.moveTowards()
       }
     } else {
-      this.setTarget(Apple)
+      this.setTarget([Apple, Pear])
     }
   }
 
@@ -69,24 +72,34 @@ class Person implements Object1 {
 
   targetReached() {
     switch (this.target?.type) {
-      case Apple: {
-        const apple = this.world.takeObject(Apple, this.target.pos)
+      case Apple:
+      case Pear: {
+        const apple = this.world.takeObject(this.target.type, this.target.pos)
         if (apple) {
           this.inventory = apple
-          this.setTarget(House)
+          this.setTarget([House])
         } else {
           // Someone else must have picked up the apple; let's find a new one
-          this.setTarget(Apple)
+          this.setTarget([Apple, Pear])
         }
         break
       }
 
       case House: {
-        this.world.interact(House, this.pos, 'addToStore', [this.inventory])
+        const isFull = this.world.interact(House, this.pos, 'addToStore', [
+          this.inventory,
+        ])
+        if (isFull) {
+          this.target = undefined
+        } else {
+          this.setTarget([Apple, Pear])
+        }
         this.inventory = undefined
-        this.setTarget(Apple)
         break
       }
+
+      default:
+        throw new Error(`Unknown target: ${this.target?.type}`)
     }
   }
 
@@ -98,6 +111,7 @@ class Person implements Object1 {
     return {
       id: this.id,
       inventory: this.inventory ? this.inventory.debugInfo() : 'empty',
+      target: this.target || 'none',
     }
   }
 }

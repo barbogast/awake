@@ -61,10 +61,14 @@ class World {
     }
   }
 
-  findPos(type: ObjectType) {
-    const objects = this.objects.filter((o) => o.constructor === type)
+  findPos(types: ObjectType[]): { type: ObjectType; pos: Pos } | void {
+    const objects = this.objects.filter((o: Object) =>
+      types.includes(o.constructor),
+    )
     const obj = objects[Math.floor(Math.random() * objects.length)]
-    return obj ? obj.pos : undefined
+    if (obj) console.log(obj.constructor)
+
+    return obj ? { pos: obj.pos, type: obj.constructor } : undefined
   }
 
   takeObject(type: ObjectType, pos: Pos) {
@@ -82,7 +86,7 @@ class World {
       return false
     }
     // @ts-ignore
-    obj[method](...params)
+    return obj[method](...params)
   }
 
   tick() {
@@ -113,13 +117,14 @@ class World {
   }
 
   getObjectsByType() {
-    const objByType: { [key: string]: Object1[] } = {
-      Apple: [],
-      House: [],
-      Person: [],
-    }
+    const objByType: { [key: string]: Object1[] } = {}
     for (const obj of this.objects) {
-      objByType[obj.constructor.name].push(obj)
+      let list = objByType[obj.constructor.name]
+      if (!list) {
+        list = []
+        objByType[obj.constructor.name] = list
+      }
+      list.push(obj)
     }
     return objByType
   }

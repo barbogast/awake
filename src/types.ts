@@ -1,5 +1,6 @@
 import Apple from './sim/apple'
 import House from './sim/house'
+import Pear from './sim/pear'
 import Person from './sim/person'
 import Pos from './sim/pos'
 
@@ -13,7 +14,11 @@ export interface Object1 {
   debugInfo(): any
 }
 
-export type ObjectType = typeof Person | typeof Apple | typeof House
+export type ObjectType =
+  | typeof Person
+  | typeof Apple
+  | typeof House
+  | typeof Pear
 
 export type Hitbox = {
   x: [number, number]

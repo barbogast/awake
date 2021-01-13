@@ -10,9 +10,9 @@ type x = {
 
 const SimpleObjectList = ({ objectList, name }: x) => {
   return (
-    <>
+    <div>
       {name}: <span>{objectList.map((obj) => obj.debugInfo()).join(', ')}</span>
-    </>
+    </div>
   )
 }
 
@@ -36,7 +36,7 @@ const Dashboard = ({ world }: { world: World }) => {
       <br />
       <br />
       {Object.entries(world.getObjectsByType()).map(([type, objList]) =>
-        type === 'Apple' ? (
+        ['Apple', 'Pear'].includes(type) ? (
           <SimpleObjectList name={type} objectList={objList} />
         ) : (
           <ObjectList name={type} objectList={objList} />
