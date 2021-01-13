@@ -1,6 +1,6 @@
 import House from './house.js'
 import Pos from './pos.js'
-import { ObjectType, Object1 } from './types.js'
+import { ObjectType, Object1 } from '../types.js'
 
 class World {
   ctx1: CanvasRenderingContext2D

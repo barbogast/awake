@@ -1,7 +1,7 @@
-import Apple from './apple'
-import House from './house'
-import Person from './person'
-import Pos from './pos'
+import Apple from './sim/apple'
+import House from './sim/house'
+import Person from './sim/person'
+import Pos from './sim/pos'
 
 export interface Object1 {
   pos: Pos

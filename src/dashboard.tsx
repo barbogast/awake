@@ -1,6 +1,6 @@
 import { h, Fragment } from 'preact'
 
-import World from './world'
+import World from './sim/world'
 import { Object1 } from './types'
 
 type x = {

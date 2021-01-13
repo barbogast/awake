@@ -1,5 +1,5 @@
 import Pos from './pos.js'
-import { Hitbox, Object1 } from './types.js'
+import { Hitbox, Object1 } from '../types.js'
 import { drawCircle } from './utils.js'
 
 class Apple implements Object1 {

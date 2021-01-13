@@ -1,14 +1,14 @@
 import { render, h, Fragment } from 'preact'
 import { useEffect, useState } from 'preact/hooks'
 
-import Apple from './apple.js'
-import House from './house.js'
-import Person from './person.js'
-import Pos from './pos.js'
-import World from './world.js'
+import Apple from './sim/apple.js'
+import House from './sim/house.js'
+import Person from './sim/person.js'
+import Pos from './sim/pos.js'
+import World from './sim/world.js'
 import Dashboard from './dashboard.js'
 
-import { getRandomArbitrary, getRandomPos } from './utils.js'
+import { getRandomArbitrary, getRandomPos } from './sim/utils.js'
 import { HEIGHT, WIDTH } from './constants.js'
 
 function addAppleAddRandomPos(world: World) {

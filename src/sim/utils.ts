@@ -1,5 +1,5 @@
 import Pos from './pos.js'
-import { HEIGHT, WIDTH } from './constants.js'
+import { HEIGHT, WIDTH } from '../constants.js'
 
 export function getRandomArbitrary(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min)
