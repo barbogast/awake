@@ -72,7 +72,7 @@ const App = () => {
       </div>
       Frame: {counter}
       <br />
-      {world && <Dashboard world={world} />}Î
+      {world && <Dashboard world={world} />}
     </div>
   )
 }

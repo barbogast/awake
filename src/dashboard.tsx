@@ -8,6 +8,14 @@ type x = {
   name: string
 }
 
+const SimpleObjectList = ({ objectList, name }: x) => {
+  return (
+    <>
+      {name}: <span>{objectList.map((obj) => obj.debugInfo()).join(', ')}</span>
+    </>
+  )
+}
+
 const ObjectList = ({ objectList, name }: x) => {
   return (
     <div>
@@ -25,9 +33,15 @@ const Dashboard = ({ world }: { world: World }) => {
   return (
     <>
       Number of objects: {world.objects.length}
-      {Object.entries(world.getObjectsByType()).map(([type, objList]) => (
-        <ObjectList name={type} objectList={objList} />
-      ))}
+      <br />
+      <br />
+      {Object.entries(world.getObjectsByType()).map(([type, objList]) =>
+        type === 'Apple' ? (
+          <SimpleObjectList name={type} objectList={objList} />
+        ) : (
+          <ObjectList name={type} objectList={objList} />
+        ),
+      )}
     </>
   )
 }

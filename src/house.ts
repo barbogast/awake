@@ -46,7 +46,10 @@ class House implements Object1 {
   }
 
   debugInfo() {
-    return { id: this.id, store: this.store.map((obj) => obj.debugInfo()) }
+    return {
+      id: this.id,
+      store: this.store.map((obj) => obj.debugInfo()).join(', '),
+    }
   }
 }
 
