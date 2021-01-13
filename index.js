@@ -1,6 +1,3 @@
-const canvas = document.getElementById("myCanvas");
-const ctx = canvas.getContext("2d");
-
 const WIDTH = 200;
 const HEIGHT = 200;
 
@@ -12,12 +9,27 @@ function getRandomPos() {
   return new Pos(getRandomArbitrary(1, WIDTH), getRandomArbitrary(1, HEIGHT));
 }
 
-function drawCircle(pos, color, radius) {
+function chunkArray(array, chunkSize) {
+  return [].concat.apply(
+    [],
+    array.map(function (elem, i) {
+      return i % chunkSize ? [] : [array.slice(i, i + chunkSize)];
+    })
+  );
+}
+
+function drawCircle(ctx, pos, color, radius) {
   ctx.beginPath();
   ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
   ctx.fillStyle = color;
   ctx.fill();
   ctx.closePath();
+}
+
+function drawRect(ctx, pos, color, size) {
+  ctx.fillStyle = color;
+  const s = size / 2;
+  ctx.fillRect(pos.x - s, pos.y - s, size, size);
 }
 
 class Pos {
@@ -41,31 +53,37 @@ class Pos {
     this.vector = new Vector(this.x, value);
   }
 
-  equal(pos) {
+  equals(pos) {
     return this.x === pos.x && this.y === pos.y;
+  }
+
+  clone() {
+    return new Pos(this.x, this.y);
   }
 }
 
 class Person {
+  radius = 12;
+
   constructor(pos, world) {
     this.pos = pos;
     this.world = world;
     this.inventory = undefined;
   }
 
-  setHome(home) {
-    this.home = home;
+  setTarget(pos, type) {
+    this.target = { pos, type };
   }
 
   tick() {
-    if (this.target) {
-      if (this.pos.equal(this.target.pos)) {
-        this.targetReached(this.target);
+    if (this.target?.pos) {
+      if (this.pos.equals(this.target.pos)) {
+        this.targetReached();
       } else {
         this.moveTowards(this.target);
       }
     } else {
-      this.target = this.world.find(Apple);
+      this.setTarget(this.world.findPos(Apple), Apple);
     }
   }
 
@@ -80,65 +98,164 @@ class Person {
     }
 
     if (this.inventory) {
-      this.inventory.pos = this.pos;
+      this.inventory.pos = this.pos.clone();
     }
   }
 
-  draw() {
-    drawCircle(this.pos, "lightblue", 12);
+  draw(ctx) {
+    drawCircle(ctx, this.pos, "lightblue", this.radius);
     if (this.inventory) {
-      this.inventory.draw();
+      this.inventory.draw(ctx);
     }
   }
 
-  targetReached(target) {
-    switch (target.constructor) {
+  targetReached() {
+    switch (this.target.type) {
       case Apple: {
-        this.inventory = this.target;
-        this.world.remove(this.target);
-        this.target = this.world.find(Home);
+        const apple = this.world.takeObject(Apple, this.target.pos);
+        if (apple) {
+          this.inventory = apple;
+          this.setTarget(this.world.findPos(House), House);
+        } else {
+          // Someone else must have picked up the apple; let's find a new one
+          this.setTarget(this.world.findPos(Apple), Apple);
+        }
         break;
       }
 
-      case Home: {
+      case House: {
+        this.world.interact(House, this.pos, "addToStore", [this.inventory]);
         this.inventory = undefined;
-        this.target = this.world.find(Apple);
+        this.setTarget(this.world.findPos(Apple), Apple);
+        break;
       }
     }
+  }
+  getHitbox() {
+    return undefined;
   }
 }
 
 class Apple {
+  radius = 5;
   constructor(pos) {
     this.pos = pos;
   }
 
-  draw() {
-    drawCircle(this.pos, "green", 5);
+  draw(ctx) {
+    drawCircle(ctx, this.pos, "green", this.radius);
+  }
+
+  getHitbox() {
+    return {
+      x: [this.pos.x - this.radius, this.pos.x + this.radius],
+      y: [this.pos.y - this.radius, this.pos.y + this.radius],
+    };
   }
 }
 
-class Home {
+class House {
+  size = 70;
+
   constructor(pos) {
     this.pos = pos;
+    this.store = [];
   }
 
-  draw() {
-    drawCircle(this.pos, "black", 5);
+  draw(ctx) {
+    drawRect(ctx, this.pos, "black", this.size);
+
+    const rows = chunkArray(this.store, 3);
+    rows.forEach((row, i) => {
+      const y = this.pos.y - 12.5 + i * 15;
+      row.forEach((obj, i) => {
+        const x = this.pos.x - 12.5 + i * 15;
+        obj.pos.x = x;
+        obj.pos.y = y;
+        obj.draw(ctx);
+      });
+    });
+  }
+
+  addToStore(obj) {
+    this.store.push(obj);
+  }
+
+  getHitbox() {
+    const halfSize = this.size / 2;
+    return {
+      x: [this.pos.x - halfSize, this.pos.x + halfSize],
+      y: [this.pos.y - halfSize, this.pos.y + halfSize],
+    };
   }
 }
 
 class World {
-  constructor() {
+  constructor(ctx1, ctx2) {
+    this.ctx1 = ctx1;
+    this.ctx2 = ctx2;
     this.objects = [];
   }
 
-  find(type) {
-    return this.objects.find((o) => o.constructor === type);
+  objectCollides(objA) {
+    const hitboxA = objA.getHitbox();
+    if (!hitboxA) {
+      return false;
+    }
+
+    for (const objB of this.objects) {
+      const hitboxB = objB.getHitbox();
+      if (!hitboxB) {
+        continue;
+      }
+
+      const aRightOfB = hitboxB.x[1] < hitboxA.x[0];
+      const bRightOfA = hitboxA.x[1] < hitboxB.x[0];
+      if (!(aRightOfB || bRightOfA)) {
+        return true;
+      }
+
+      const aBelowB = hitboxB.y[1] < hitboxA.y[0];
+      const bBelowA = hitboxA.y[1] < hitboxB.y[0];
+      if (!(aBelowB || bBelowA)) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  remove(obj) {
-    this.objects = this.objects.filter((o) => o !== obj);
+  _findAt(type, pos) {
+    return this.objects.find(
+      (obj) => obj.constructor === type && obj.pos.equals(pos)
+    );
+  }
+
+  add(obj) {
+    if (this.objectCollides(obj)) {
+      return false;
+    } else {
+      this.objects.push(obj);
+      return true;
+    }
+  }
+
+  findPos(type) {
+    const objects = this.objects.filter((o) => o.constructor === type);
+    const obj = objects[Math.floor(Math.random() * objects.length)];
+    return obj ? obj.pos : undefined;
+  }
+
+  takeObject(type, pos) {
+    const obj = this._findAt(type, pos);
+    if (!obj) {
+      return undefined;
+    }
+    this.objects.splice(this.objects.indexOf(obj), 1);
+    return obj;
+  }
+
+  interact(type, pos, method, params) {
+    this._findAt(type, pos)[method](...params);
   }
 
   tick() {
@@ -151,33 +268,53 @@ class World {
 
   draw() {
     for (const obj of this.objects) {
-      obj.draw();
+      obj.draw(obj.constructor === House ? this.ctx1 : this.ctx2);
     }
   }
 }
 
-function addApple(world) {
-  const apple = new Apple(getRandomPos());
-  world.objects.push(apple);
-  setTimeout(() => addApple(world), getRandomArbitrary(0.5, 3) * 1000);
+function addAppleAddRandomPos(world) {
+  let counter = 0;
+  while (true) {
+    const apple = new Apple(getRandomPos());
+    if (world.add(apple)) {
+      return;
+    }
+    if (counter > 1000) {
+      throw new Error("No free spot for apple found");
+    }
+    counter += 1;
+  }
+}
+
+function addApples(world) {
+  addAppleAddRandomPos(world);
+  setTimeout(() => addApples(world), getRandomArbitrary(1, 3) * 1000);
 }
 
 function main() {
-  const world = new World();
-  const home = new Home(new Pos(50, 50));
-  const person = new Person(new Pos(50, 50), world);
-  person.setHome(home);
+  const canvas1 = document.getElementById("myCanvas1");
+  const ctx1 = canvas1.getContext("2d");
+  const canvas2 = document.getElementById("myCanvas2");
+  const ctx2 = canvas2.getContext("2d");
 
-  world.objects.push(person);
-  world.objects.push(home);
+  const world = new World(ctx1, ctx2);
+  const home = new House(new Pos(50, 50));
+  const person1 = new Person(new Pos(50, 50), world);
+  const person2 = new Person(new Pos(100, 100), world);
+
+  world.add(person1);
+  world.add(person2);
+  world.add(home);
 
   function renderLoop() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx1.clearRect(0, 0, WIDTH, HEIGHT);
+    ctx2.clearRect(0, 0, WIDTH, HEIGHT);
     world.tick();
     world.draw();
     requestAnimationFrame(renderLoop);
   }
 
   renderLoop();
-  addApple(world);
+  addApples(world);
 }
