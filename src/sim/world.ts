@@ -45,9 +45,7 @@ class World {
   }
 
   _findAt(type: ObjectType, pos: Pos) {
-    return this.objects.find(
-      (obj) => obj.pos.equals(pos) && obj.constructor === type,
-    )
+    return this.objects.find((obj) => obj.pos.equals(pos) && obj.type === type)
   }
 
   add(obj: Object1) {
@@ -62,13 +60,17 @@ class World {
   }
 
   findPos(types: ObjectType[]): { type: ObjectType; pos: Pos } | void {
-    const objects = this.objects.filter((o: Object) =>
-      types.includes(o.constructor),
-    )
+    const objects = this.objects.filter((o) => {
+      const type = o.type as ObjectType
+      return types.includes(type)
+    })
     const obj = objects[Math.floor(Math.random() * objects.length)]
-    if (obj) console.log(obj.constructor)
-
-    return obj ? { pos: obj.pos, type: obj.constructor } : undefined
+    if (obj) {
+      const type = obj.type as ObjectType
+      return { pos: obj.pos, type }
+    } else {
+      return undefined
+    }
   }
 
   takeObject(type: ObjectType, pos: Pos) {

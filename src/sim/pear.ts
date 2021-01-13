@@ -3,6 +3,7 @@ import { Hitbox, Object1 } from '../types.js'
 import { drawCircle } from './utils.js'
 
 class Pear implements Object1 {
+  type = 'Pear'
   radius = 5
   pos: Pos
   id!: string

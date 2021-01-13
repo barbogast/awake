@@ -3,6 +3,7 @@ import { Hitbox, Object1 } from '../types.js'
 import { chunkArray, drawRect } from './utils.js'
 
 class House implements Object1 {
+  type = 'House'
   size = 70
   store: Object1[]
   id!: string

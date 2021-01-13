@@ -7,6 +7,7 @@ import { drawCircle } from './utils.js'
 import Pear from './pear.js'
 
 class Person implements Object1 {
+  type = 'Person'
   radius = 12
   pos: Pos
   world: World
@@ -41,7 +42,7 @@ class Person implements Object1 {
         this.moveTowards()
       }
     } else {
-      this.setTarget([Apple, Pear])
+      this.setTarget(['Apple', 'Pear'])
     }
   }
 
@@ -72,27 +73,27 @@ class Person implements Object1 {
 
   targetReached() {
     switch (this.target?.type) {
-      case Apple:
-      case Pear: {
+      case 'Apple':
+      case 'Pear': {
         const apple = this.world.takeObject(this.target.type, this.target.pos)
         if (apple) {
           this.inventory = apple
-          this.setTarget([House])
+          this.setTarget(['House'])
         } else {
           // Someone else must have picked up the apple; let's find a new one
-          this.setTarget([Apple, Pear])
+          this.setTarget(['Apple', 'Pear'])
         }
         break
       }
 
-      case House: {
-        const isFull = this.world.interact(House, this.pos, 'addToStore', [
+      case 'House': {
+        const isFull = this.world.interact('House', this.pos, 'addToStore', [
           this.inventory,
         ])
         if (isFull) {
           this.target = undefined
         } else {
-          this.setTarget([Apple, Pear])
+          this.setTarget(['Apple', 'Pear'])
         }
         this.inventory = undefined
         break

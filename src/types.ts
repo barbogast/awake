@@ -5,6 +5,7 @@ import Person from './sim/person'
 import Pos from './sim/pos'
 
 export interface Object1 {
+  type: string
   pos: Pos
   id: string
   setId(id: string): void
@@ -14,11 +15,7 @@ export interface Object1 {
   debugInfo(): any
 }
 
-export type ObjectType =
-  | typeof Person
-  | typeof Apple
-  | typeof House
-  | typeof Pear
+export type ObjectType = 'Person' | 'House' | 'Apple' | 'Pear'
 
 export type Hitbox = {
   x: [number, number]
