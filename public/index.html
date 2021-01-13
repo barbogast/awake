@@ -10,21 +10,8 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="main-container">
-      <div class="game-screen screen">
-        <div class="in-game-menu">
-          <button class="abort">Quit game</button>
-          <button class="show">Show</button>
-          <div class="lives">Lives:&nbsp;<span class="lives-value"></span></div>
-        </div>
-        <div class="canvas-wrapper">
-          <canvas id="myCanvas1" class="canvas" width="500" height="500"></canvas>
-          <canvas id="myCanvas2" class="canvas" width="500" height="500"></canvas>
-        </div>
-      </div>
-
-    <script type="module" src="index.js"></script>
+    <div id="root"></div>
+    <script type="module" src="/dist/index.js"></script>
     <script type="text/javascript" src="./vector.js"></script>
-
   </body>
 </html>

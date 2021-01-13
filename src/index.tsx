@@ -1,3 +1,6 @@
+import { render, h } from 'preact'
+import { useEffect } from 'preact/hooks'
+
 import Apple from './apple.js'
 import House from './house.js'
 import Person from './person.js'
@@ -52,4 +55,18 @@ function main() {
   addApples(world)
 }
 
-main()
+const App = () => {
+  useEffect(main, [])
+
+  return (
+    <div class="canvas-wrapper">
+      <canvas id="myCanvas1" class="canvas" width="500" height="500"></canvas>
+      <canvas id="myCanvas2" class="canvas" width="500" height="500"></canvas>
+    </div>
+  )
+}
+const root = document.getElementById('root')
+
+if (root) {
+  render(<App />, root)
+}
