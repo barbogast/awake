@@ -1,18 +1,18 @@
 import House from './house.js'
 import Pos from './pos.js'
-import { ObjectType, Object } from './types.js'
+import { ObjectType, Object1 } from './types.js'
 
 class World {
   ctx1: CanvasRenderingContext2D
   ctx2: CanvasRenderingContext2D
-  objects: Object[]
+  objects: Object1[]
   constructor(ctx1: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D) {
     this.ctx1 = ctx1
     this.ctx2 = ctx2
     this.objects = []
   }
 
-  objectCollides(objA: Object) {
+  objectCollides(objA: Object1) {
     const hitboxA = objA.getHitbox()
     if (!hitboxA) {
       return false
@@ -45,7 +45,7 @@ class World {
     )
   }
 
-  add(obj: Object) {
+  add(obj: Object1) {
     if (this.objectCollides(obj)) {
       return false
     } else {

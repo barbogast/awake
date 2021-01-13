@@ -2,14 +2,14 @@ import Apple from './apple.js'
 import House from './house.js'
 import Pos from './pos.js'
 import World from './world.js'
-import { ObjectType, Object } from './types.js'
+import { ObjectType, Object1 } from './types.js'
 import { drawCircle } from './utils.js'
 
-class Person implements Object {
+class Person implements Object1 {
   radius = 12
   pos: Pos
   world: World
-  inventory: undefined | Object
+  inventory: undefined | Object1
   target: { pos: Pos; type: ObjectType } | undefined
 
   constructor(pos: Pos, world: World) {

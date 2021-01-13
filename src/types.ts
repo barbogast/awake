@@ -3,7 +3,7 @@ import House from './house'
 import Person from './person'
 import Pos from './pos'
 
-export interface Object {
+export interface Object1 {
   pos: Pos
   tick?(): void
   draw(ctx: CanvasRenderingContext2D): void

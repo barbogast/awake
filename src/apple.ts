@@ -1,8 +1,8 @@
 import Pos from './pos.js'
-import { Hitbox, Object } from './types.js'
+import { Hitbox, Object1 } from './types.js'
 import { drawCircle } from './utils.js'
 
-class Apple implements Object {
+class Apple implements Object1 {
   radius = 5
   pos: Pos
   constructor(pos: Pos) {

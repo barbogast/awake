@@ -1,10 +1,10 @@
 import Pos from './pos.js'
-import { Hitbox, Object } from './types.js'
+import { Hitbox, Object1 } from './types.js'
 import { chunkArray, drawRect } from './utils.js'
 
-class House implements Object {
+class House implements Object1 {
   size = 70
-  store: Object[]
+  store: Object1[]
 
   constructor(pos: Pos) {
     this.pos = pos
@@ -27,7 +27,7 @@ class House implements Object {
     })
   }
 
-  addToStore(obj: Object) {
+  addToStore(obj: Object1) {
     this.store.push(obj)
   }
 
