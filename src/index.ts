@@ -203,44 +203,6 @@ class Apple implements Object {
   }
 }
 
-class House implements Object {
-  size = 70;
-  store: Object[];
-
-  constructor(pos: Pos) {
-    this.pos = pos;
-    this.store = [];
-  }
-
-  draw(ctx: CanvasRenderingContext2D) {
-    drawRect(ctx, this.pos, "black", this.size);
-
-    const rows = chunkArray(this.store, 3);
-    rows.forEach((row, i) => {
-      const y = this.pos.y - 12.5 + i * 15;
-      row.forEach((obj, i) => {
-        const x = this.pos.x - 12.5 + i * 15;
-        obj.pos.x = x;
-        obj.pos.y = y;
-        obj.draw(ctx);
-      });
-    });
-  }
-
-  addToStore(obj: Object) {
-    this.store.push(obj);
-  }
-
-  getHitbox() {
-    const halfSize = this.size / 2;
-    const h: Hitbox = {
-      x: [this.pos.x - halfSize, this.pos.x + halfSize],
-      y: [this.pos.y - halfSize, this.pos.y + halfSize],
-    };
-    return h;
-  }
-}
-
 function addAppleAddRandomPos(world: World) {
   let counter = 0;
   while (true) {
