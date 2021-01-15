@@ -38,6 +38,11 @@ export function drawCircle(
   ctx.fillStyle = color
   ctx.fill()
   ctx.closePath()
+
+  ctx.beginPath()
+  ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2)
+  ctx.lineWidth = 1
+  ctx.stroke()
 }
 
 export function drawRect(
