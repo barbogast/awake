@@ -44,14 +44,19 @@ function addApples(world: World) {
 }
 
 let world: World
-let stop = false
+let state = 'initial'
+let ctx1
+let ctx2
+let callback
 
-function main(callback: () => void) {
+function setup() {
   const canvas1 = document.getElementById('myCanvas1') as HTMLCanvasElement
-  const ctx1 = canvas1.getContext('2d') as CanvasRenderingContext2D
+  ctx1 = canvas1.getContext('2d') as CanvasRenderingContext2D
   const canvas2 = document.getElementById('myCanvas2') as HTMLCanvasElement
-  const ctx2 = canvas2.getContext('2d') as CanvasRenderingContext2D
+  ctx2 = canvas2.getContext('2d') as CanvasRenderingContext2D
+}
 
+function resetSimuliation() {
   world = new World(ctx1, ctx2)
   const home = new House(new Pos(50, 50), world)
   const person1 = new Person(new Pos(50, 50), world)
@@ -61,34 +66,59 @@ function main(callback: () => void) {
   world.add(person2)
   world.add(home)
 
-  function renderLoop() {
-    ctx1.clearRect(0, 0, WIDTH, HEIGHT)
-    ctx2.clearRect(0, 0, WIDTH, HEIGHT)
-    world.tick()
-    world.draw()
-    callback()
-    if (!stop) {
-      requestAnimationFrame(renderLoop)
-    }
+  addApples(world)
+}
+
+function clearUi() {
+  ctx1.clearRect(0, 0, WIDTH, HEIGHT)
+  ctx2.clearRect(0, 0, WIDTH, HEIGHT)
+}
+
+function renderLoop() {
+  if (state !== 'running') {
+    return
   }
 
-  renderLoop()
-  addApples(world)
+  clearUi()
+  world.tick()
+  world.draw()
+  callback()
+  requestAnimationFrame(renderLoop)
 }
 
 const App = () => {
   const [counter, setCounter] = useState(0)
-  useEffect(() => main(() => setCounter((c) => c + 1)), [])
+  callback = () => setCounter((c) => c + 1)
+
+  useEffect(() => {
+    setup()
+    resetSimuliation()
+  }, [])
+
+  const onStart = () => {
+    if (state !== 'running') {
+      state = 'running'
+      renderLoop()
+    } else {
+      state = 'paused'
+    }
+  }
+
+  const onReset = () => {
+    state = 'initial'
+    clearUi()
+    resetSimuliation()
+    callback()
+  }
 
   return (
     <div>
-      <button
-        onClick={() => {
-          stop = true
-        }}
-      >
-        Stop
+      <button onClick={onStart}>
+        {state === 'initial' && 'Start'}
+        {state === 'running' && 'Pause'}
+        {state === 'paused' && 'Continue'}
       </button>
+      {state !== 'initial' && <button onClick={onReset}>Reset</button>}
       <div class="top-row">
         <div class="canvas-wrapper">
           <canvas
