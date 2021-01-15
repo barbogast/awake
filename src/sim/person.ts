@@ -6,7 +6,7 @@ import { ObjectType, Object1, LoggingFunction } from '../types.js'
 import { drawCircle } from './utils.js'
 import Pear from './pear.js'
 
-const EAT_WHEN_LESS_THEN = 100
+const EAT_WHEN_LESS_THEN = 500
 
 class Person implements Object1 {
   type = 'Person'
@@ -38,6 +38,10 @@ class Person implements Object1 {
   }
 
   tick() {
+    if (this.energy <= 0) {
+      return
+    }
+
     this.energy -= 1
 
     if (this.energy < EAT_WHEN_LESS_THEN) {

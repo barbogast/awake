@@ -8,7 +8,7 @@ class Apple implements Object1 {
   pos: Pos
   id!: string
   log!: LoggingFunction
-  energy = 50
+  energy = 500
 
   constructor(pos: Pos) {
     this.pos = pos

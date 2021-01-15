@@ -8,7 +8,7 @@ class Pear implements Object1 {
   pos: Pos
   id!: string
   log!: LoggingFunction
-  energy = 75
+  energy = 750
 
   constructor(pos: Pos) {
     this.pos = pos
