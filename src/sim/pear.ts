@@ -1,5 +1,5 @@
 import Pos from './pos.js'
-import { Hitbox, Object1 } from '../types.js'
+import { Hitbox, LoggingFunction, Object1 } from '../types.js'
 import { drawCircle } from './utils.js'
 
 class Pear implements Object1 {
@@ -7,14 +7,11 @@ class Pear implements Object1 {
   radius = 5
   pos: Pos
   id!: string
+  log!: LoggingFunction
   energy = 75
 
   constructor(pos: Pos) {
     this.pos = pos
-  }
-
-  setId(id: string) {
-    this.id = id
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -30,7 +27,11 @@ class Pear implements Object1 {
   }
 
   debugInfo() {
-    return `Pear ${this.id}`
+    return this.toString()
+  }
+
+  toString() {
+    return `${this.type} (${this.id})`
   }
 }
 

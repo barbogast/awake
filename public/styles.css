@@ -10,6 +10,11 @@ canvas {
   height: 500px;
 }
 
+.top-row {
+  display: flex;
+  flex-direction: row;
+}
+
 .pointer {
   cursor: pointer;
 }

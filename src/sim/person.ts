@@ -2,7 +2,7 @@ import Apple from './apple.js'
 import House from './house.js'
 import Pos from './pos.js'
 import World from './world.js'
-import { ObjectType, Object1 } from '../types.js'
+import { ObjectType, Object1, LoggingFunction } from '../types.js'
 import { drawCircle } from './utils.js'
 import Pear from './pear.js'
 
@@ -16,6 +16,7 @@ class Person implements Object1 {
   inventory: undefined | Object1
   target: { pos: Pos; type: ObjectType } | undefined
   id!: string
+  log!: LoggingFunction
   energy: number
 
   constructor(pos: Pos, world: World) {
@@ -25,15 +26,13 @@ class Person implements Object1 {
     this.energy = 1000
   }
 
-  setId(id: string) {
-    this.id = id
-  }
-
   setTarget(types: ObjectType[]) {
     const target = this.world.findPos(types)
     if (target) {
       this.target = target
+      this.log(`Set target to ${target.type} at ${target.pos}`)
     } else {
+      this.log(`Remove target`)
       this.target = undefined
     }
   }
@@ -66,6 +65,7 @@ class Person implements Object1 {
   }
 
   eat(obj: Object1) {
+    this.log(`Eat ${obj}`)
     this.energy += (obj as Apple | Pear).energy
   }
 
@@ -95,11 +95,13 @@ class Person implements Object1 {
   }
 
   targetReached() {
+    this.log(`Reached target`)
     switch (this.target?.type) {
       case 'Apple':
       case 'Pear': {
         const apple = this.world.takeObject(this.target.type, this.target.pos)
         if (apple) {
+          this.log(`Put ${apple} to inventory`)
           this.inventory = apple
           this.setTarget(['House'])
         } else {
@@ -111,6 +113,7 @@ class Person implements Object1 {
 
       case 'House': {
         if (this.energy < EAT_WHEN_LESS_THEN) {
+          this.log(`Reached target`)
           const obj = this.world.interact(
             'House',
             this.pos,
@@ -149,6 +152,10 @@ class Person implements Object1 {
       target: this.target || 'none',
       energy: this.energy,
     }
+  }
+
+  toString() {
+    return `${this.type} (${this.id})`
   }
 }
 

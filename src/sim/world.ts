@@ -1,6 +1,7 @@
 import House from './house.js'
 import Pos from './pos.js'
 import { ObjectType, Object1 } from '../types.js'
+import Log from './log.js'
 
 const DRAW_HITBOXES = false
 
@@ -9,12 +10,14 @@ class World {
   ctx2: CanvasRenderingContext2D
   objects: Object1[]
   counter: number
+  log: Log
 
   constructor(ctx1: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D) {
     this.ctx1 = ctx1
     this.ctx2 = ctx2
     this.objects = []
     this.counter = 0
+    this.log = new Log()
   }
 
   objectCollides(objA: Object1) {
@@ -52,9 +55,11 @@ class World {
     if (this.objectCollides(obj)) {
       return false
     } else {
-      obj.setId(String(this.counter))
       this.counter += 1
+      obj.id = String(this.counter)
+      obj.log = (text: string) => this.log.addEntry(text, obj)
       this.objects.push(obj)
+      this.log.addEntry(`Added object`, obj)
       return true
     }
   }

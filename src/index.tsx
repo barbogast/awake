@@ -7,6 +7,7 @@ import Person from './sim/person.js'
 import Pos from './sim/pos.js'
 import World from './sim/world.js'
 import Dashboard from './dashboard.js'
+import LogTrail from './logTrail.js'
 
 import { getRandomArbitrary, getRandomPos } from './sim/utils.js'
 import { HEIGHT, WIDTH } from './constants.js'
@@ -88,9 +89,22 @@ const App = () => {
       >
         Stop
       </button>
-      <div class="canvas-wrapper">
-        <canvas id="myCanvas1" class="canvas" width="500" height="500"></canvas>
-        <canvas id="myCanvas2" class="canvas" width="500" height="500"></canvas>
+      <div class="top-row">
+        <div class="canvas-wrapper">
+          <canvas
+            id="myCanvas1"
+            class="canvas"
+            width="500"
+            height="500"
+          ></canvas>
+          <canvas
+            id="myCanvas2"
+            class="canvas"
+            width="500"
+            height="500"
+          ></canvas>
+        </div>
+        <LogTrail world={world} />
       </div>
       Frame: {counter}
       <br />

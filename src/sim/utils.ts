@@ -55,3 +55,7 @@ export function drawRect(
   const s = size / 2
   ctx.fillRect(pos.x - s, pos.y - s, size, size)
 }
+
+export function getCurrentTimestamp() {
+  return new Date().getTime()
+}

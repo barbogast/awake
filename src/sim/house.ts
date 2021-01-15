@@ -1,7 +1,7 @@
 import Pos from './pos.js'
 import World from './world.js'
 import Person from './person.js'
-import { Hitbox, Object1 } from '../types.js'
+import { Hitbox, LoggingFunction, Object1 } from '../types.js'
 import { chunkArray, drawRect } from './utils.js'
 
 class House implements Object1 {
@@ -14,6 +14,7 @@ class House implements Object1 {
   }
   store: Object1[]
   id!: string
+  log!: LoggingFunction
   pos: Pos
   world: World
 
@@ -21,10 +22,6 @@ class House implements Object1 {
     this.pos = pos
     this.world = world
     this.store = []
-  }
-
-  setId(id: string) {
-    this.id = id
   }
 
   _getItemsPerRow() {
@@ -70,6 +67,7 @@ class House implements Object1 {
   }
 
   addToStore(obj: Object1) {
+    this.log(`Add ${obj} to store`)
     this.store.push(obj)
     const isFull = this.store.length === this.capacity
     if (isFull) {
@@ -82,7 +80,9 @@ class House implements Object1 {
   }
 
   takeFromStore() {
-    return this.store.shift()
+    const obj = this.store.shift()
+    this.log(`Remove ${obj} from store`)
+    return obj
   }
 
   getHitbox() {
@@ -99,6 +99,10 @@ class House implements Object1 {
       id: this.id,
       store: this.store.map((obj) => obj.debugInfo()).join(', '),
     }
+  }
+
+  toString() {
+    return `${this.type} (${this.id})`
   }
 }
 
