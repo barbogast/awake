@@ -120,8 +120,10 @@ class Person implements Object1 {
             'takeFromStore',
             [],
           )
-          this.eat(obj)
-          this.setTarget(['Apple', 'Pear'])
+          if (obj) {
+            this.eat(obj)
+            this.setTarget(['Apple', 'Pear'])
+          }
           return
         }
         const isFull = this.world.interact('House', this.pos, 'addToStore', [
