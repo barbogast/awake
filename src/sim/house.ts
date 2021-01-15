@@ -4,7 +4,12 @@ import { chunkArray, drawRect } from './utils.js'
 
 class House implements Object1 {
   type = 'House'
-  size = 70
+  capacity = 25
+  drawSettings = {
+    itemSize: 10,
+    distanceBetweenItems: 5,
+    outerBorder: 10,
+  }
   store: Object1[]
   id!: string
   pos: Pos
@@ -18,14 +23,41 @@ class House implements Object1 {
     this.id = id
   }
 
-  draw(ctx: CanvasRenderingContext2D) {
-    drawRect(ctx, this.pos, 'black', this.size)
+  _getItemsPerRow() {
+    return Math.sqrt(this.capacity)
+  }
 
-    const rows = chunkArray(this.store, 3)
+  _getSize() {
+    const itemsPerRow = this._getItemsPerRow()
+    const itemsWidth = itemsPerRow * this.drawSettings.itemSize
+    const distanceBetweenItemsWidth =
+      (itemsPerRow - 1) * this.drawSettings.distanceBetweenItems
+    const outerBorderWidth = this.drawSettings.outerBorder * 2
+    return itemsWidth + distanceBetweenItemsWidth + outerBorderWidth
+  }
+
+  _getItemCenter(storeCenter: number, index: number) {
+    const size = this._getSize()
+    const storeStart = storeCenter - size / 2
+    return (
+      storeStart +
+      this.drawSettings.outerBorder +
+      index *
+        (this.drawSettings.itemSize + this.drawSettings.distanceBetweenItems) +
+      this.drawSettings.itemSize / 2
+    )
+  }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    const itemsPerRow = this._getItemsPerRow()
+    const size = this._getSize()
+    drawRect(ctx, this.pos, 'black', size)
+
+    const rows = chunkArray(this.store, itemsPerRow)
     rows.forEach((row, i) => {
-      const y = this.pos.y - 12.5 + i * 15
+      const y = this._getItemCenter(this.pos.y, i)
       row.forEach((obj, i) => {
-        const x = this.pos.x - 12.5 + i * 15
+        const x = this._getItemCenter(this.pos.x, i)
         obj.pos.x = x
         obj.pos.y = y
         obj.draw(ctx)
@@ -35,12 +67,12 @@ class House implements Object1 {
 
   addToStore(obj: Object1) {
     this.store.push(obj)
-    const isFull = this.store.length === 9
+    const isFull = this.store.length === this.capacity
     return isFull
   }
 
   getHitbox() {
-    const halfSize = this.size / 2
+    const halfSize = this._getSize() / 2
     const h: Hitbox = {
       x: [this.pos.x - halfSize, this.pos.x + halfSize],
       y: [this.pos.y - halfSize, this.pos.y + halfSize],
