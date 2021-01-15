@@ -1,10 +1,12 @@
 import Pos from './pos.js'
+import World from './world.js'
+import Person from './person.js'
 import { Hitbox, Object1 } from '../types.js'
 import { chunkArray, drawRect } from './utils.js'
 
 class House implements Object1 {
   type = 'House'
-  capacity = 25
+  capacity = 9
   drawSettings = {
     itemSize: 10,
     distanceBetweenItems: 5,
@@ -13,9 +15,11 @@ class House implements Object1 {
   store: Object1[]
   id!: string
   pos: Pos
+  world: World
 
-  constructor(pos: Pos) {
+  constructor(pos: Pos, world: World) {
     this.pos = pos
+    this.world = world
     this.store = []
   }
 
@@ -68,6 +72,12 @@ class House implements Object1 {
   addToStore(obj: Object1) {
     this.store.push(obj)
     const isFull = this.store.length === this.capacity
+    if (isFull) {
+      this.world.add(new Person(this.pos.clone(), this.world))
+      this.store = []
+      return false
+    }
+
     return isFull
   }
 

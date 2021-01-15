@@ -51,7 +51,7 @@ function main(callback: () => void) {
   const ctx2 = canvas2.getContext('2d') as CanvasRenderingContext2D
 
   world = new World(ctx1, ctx2)
-  const home = new House(new Pos(50, 50))
+  const home = new House(new Pos(50, 50), world)
   const person1 = new Person(new Pos(50, 50), world)
   const person2 = new Person(new Pos(100, 100), world)
 
