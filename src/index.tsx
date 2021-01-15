@@ -43,6 +43,7 @@ function addApples(world: World) {
 }
 
 let world: World
+let stop = false
 
 function main(callback: () => void) {
   const canvas1 = document.getElementById('myCanvas1') as HTMLCanvasElement
@@ -65,7 +66,9 @@ function main(callback: () => void) {
     world.tick()
     world.draw()
     callback()
-    requestAnimationFrame(renderLoop)
+    if (!stop) {
+      requestAnimationFrame(renderLoop)
+    }
   }
 
   renderLoop()
@@ -78,6 +81,13 @@ const App = () => {
 
   return (
     <div>
+      <button
+        onClick={() => {
+          stop = true
+        }}
+      >
+        Stop
+      </button>
       <div class="canvas-wrapper">
         <canvas id="myCanvas1" class="canvas" width="500" height="500"></canvas>
         <canvas id="myCanvas2" class="canvas" width="500" height="500"></canvas>
