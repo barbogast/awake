@@ -48,7 +48,7 @@ class Person implements Object1 {
         this.eat(this.inventory)
         this.inventory = undefined
         this.setTarget(['Apple', 'Pear'])
-      } else {
+      } else if (this.target?.type === 'House') {
         this.setTarget(['House'])
       }
     }
