@@ -6,6 +6,8 @@ import { ObjectType, Object1 } from '../types.js'
 import { drawCircle } from './utils.js'
 import Pear from './pear.js'
 
+const EAT_WHEN_LESS_THEN = 100
+
 class Person implements Object1 {
   type = 'Person'
   radius = 12
@@ -14,11 +16,13 @@ class Person implements Object1 {
   inventory: undefined | Object1
   target: { pos: Pos; type: ObjectType } | undefined
   id!: string
+  energy: number
 
   constructor(pos: Pos, world: World) {
     this.pos = pos
     this.world = world
     this.inventory = undefined
+    this.energy = 1000
   }
 
   setId(id: string) {
@@ -35,6 +39,21 @@ class Person implements Object1 {
   }
 
   tick() {
+    this.energy -= 1
+
+    if (this.energy < EAT_WHEN_LESS_THEN) {
+      if (
+        this.inventory &&
+        (this.inventory.type === 'Apple' || this.inventory.type === 'Pear')
+      ) {
+        this.eat(this.inventory)
+        this.inventory = undefined
+        this.setTarget(['Apple', 'Pear'])
+      } else {
+        this.setTarget(['House'])
+      }
+    }
+
     if (this.target) {
       if (this.pos.equals(this.target.pos)) {
         this.targetReached()
@@ -44,6 +63,10 @@ class Person implements Object1 {
     } else {
       this.setTarget(['Apple', 'Pear'])
     }
+  }
+
+  eat(obj: Object1) {
+    this.energy += (obj as Apple | Pear).energy
   }
 
   moveTowards() {
@@ -87,6 +110,17 @@ class Person implements Object1 {
       }
 
       case 'House': {
+        if (this.energy < EAT_WHEN_LESS_THEN) {
+          const obj = this.world.interact(
+            'House',
+            this.pos,
+            'takeFromStore',
+            [],
+          )
+          this.eat(obj)
+          this.setTarget(['Apple', 'Pear'])
+          return
+        }
         const isFull = this.world.interact('House', this.pos, 'addToStore', [
           this.inventory,
         ])
@@ -113,6 +147,7 @@ class Person implements Object1 {
       id: this.id,
       inventory: this.inventory ? this.inventory.debugInfo() : 'empty',
       target: this.target || 'none',
+      energy: this.energy,
     }
   }
 }

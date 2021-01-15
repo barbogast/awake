@@ -7,6 +7,7 @@ class Pear implements Object1 {
   radius = 5
   pos: Pos
   id!: string
+  energy = 75
 
   constructor(pos: Pos) {
     this.pos = pos

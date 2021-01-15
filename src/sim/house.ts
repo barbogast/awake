@@ -81,6 +81,10 @@ class House implements Object1 {
     return isFull
   }
 
+  takeFromStore() {
+    return this.store.shift()
+  }
+
   getHitbox() {
     const halfSize = this._getSize() / 2
     const h: Hitbox = {

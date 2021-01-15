@@ -7,6 +7,7 @@ class Apple implements Object1 {
   radius = 5
   pos: Pos
   id!: string
+  energy = 50
 
   constructor(pos: Pos) {
     this.pos = pos
