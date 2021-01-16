@@ -7,6 +7,8 @@ import { drawCircle } from './utils.js'
 import Pear from './pear.js'
 
 const EAT_WHEN_LESS_THEN = 500
+const MAX_ENERGY = 1000
+const INITIAL_ENERGY = 750
 
 class Person implements Object1 {
   type = 'Person'
@@ -23,7 +25,7 @@ class Person implements Object1 {
     this.pos = pos
     this.world = world
     this.inventory = undefined
-    this.energy = 1000
+    this.energy = INITIAL_ENERGY
   }
 
   setTarget(types: ObjectType[]) {
@@ -32,7 +34,7 @@ class Person implements Object1 {
       this.target = target
       this.log(`Set target to ${target.type} at ${target.pos}`)
     } else {
-      this.log(`Remove target`)
+      this.log(`Couldn't find target`)
       this.target = undefined
     }
   }
@@ -70,7 +72,10 @@ class Person implements Object1 {
 
   eat(obj: Object1) {
     this.log(`Eat ${obj}`)
-    this.energy += (obj as Apple | Pear).energy
+    this.energy = Math.min(
+      this.energy + (obj as Apple | Pear).energy,
+      MAX_ENERGY,
+    )
   }
 
   moveTowards() {
@@ -96,6 +101,24 @@ class Person implements Object1 {
     if (this.inventory) {
       this.inventory.draw(ctx)
     }
+    this.drawEnergyBar(ctx)
+  }
+
+  drawEnergyBar(ctx: CanvasRenderingContext2D) {
+    const width = 3
+
+    // First draw full red bar
+    const xRed = this.pos.x + this.radius
+    const yRed = this.pos.y - this.radius
+    const heightRed = this.radius * 2
+    ctx.fillStyle = 'red'
+    ctx.fillRect(xRed, yRed, width, heightRed)
+
+    // Then add partial green bar on top
+    const heightGreen = (heightRed * this.energy) / MAX_ENERGY
+    const yGreen = yRed + heightRed - heightGreen
+    ctx.fillStyle = 'green'
+    ctx.fillRect(xRed, yGreen, width, heightGreen)
   }
 
   targetReached() {
