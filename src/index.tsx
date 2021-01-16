@@ -70,8 +70,8 @@ function resetSimuliation() {
 }
 
 function clearUi() {
-  ctx1.clearRect(0, 0, WIDTH, HEIGHT)
-  ctx2.clearRect(0, 0, WIDTH, HEIGHT)
+  ctx1.clearRect(0, 0, WIDTH + 20, HEIGHT + 20)
+  ctx2.clearRect(0, 0, WIDTH + 20, HEIGHT + 20)
 }
 
 function renderLoop() {
