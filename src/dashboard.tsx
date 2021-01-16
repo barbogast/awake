@@ -34,6 +34,8 @@ const Dashboard = ({ world }: { world: World }) => {
     <>
       Number of objects: {world.objects.length}
       <br />
+      Timers: {JSON.stringify(world.timers)}
+      <br />
       <br />
       {Object.entries(world.getObjectsByType()).map(([type, objList]) =>
         ['Apple', 'Pear'].includes(type) ? (

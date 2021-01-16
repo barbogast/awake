@@ -38,11 +38,6 @@ function addAppleAddRandomPos(world: World) {
   }
 }
 
-function addApples(world: World) {
-  addAppleAddRandomPos(world)
-  setTimeout(() => addApples(world), getRandomArbitrary(1, 3) * 1000)
-}
-
 let world: World
 let state = 'initial'
 let ctx1
@@ -68,7 +63,9 @@ function resetSimuliation() {
   world.add(person2)
   world.add(home)
 
-  addApples(world)
+  const nextTick = (currentTick: number) =>
+    currentTick + getRandomArbitrary(1, 3) * 60
+  world.addTimer('addApples', nextTick, () => addAppleAddRandomPos(world))
 }
 
 function clearUi() {
@@ -83,7 +80,7 @@ function renderLoop() {
 
   tick += 1
   clearUi()
-  world.tick()
+  world.tick(tick)
   world.draw()
 
   callback(tick)

@@ -5,12 +5,22 @@ import Log from './log.js'
 
 const DRAW_HITBOXES = false
 
+type GetNextTick = (currentTick: number) => number
+type Callback = () => void
+
 class World {
   ctx1: CanvasRenderingContext2D
   ctx2: CanvasRenderingContext2D
   objects: Object1[]
   counter: number
   log: Log
+  currentTick: number
+  timers: {
+    id: string
+    getNextTick: GetNextTick
+    callback: Callback
+    nextTick: number
+  }[]
 
   constructor(ctx1: CanvasRenderingContext2D, ctx2: CanvasRenderingContext2D) {
     this.ctx1 = ctx1
@@ -18,6 +28,8 @@ class World {
     this.objects = []
     this.counter = 0
     this.log = new Log()
+    this.currentTick = 0
+    this.timers = []
   }
 
   objectCollides(objA: Object1) {
@@ -96,12 +108,29 @@ class World {
     return obj[method](...params)
   }
 
-  tick() {
+  tick(tick: number) {
+    this.currentTick = tick
     for (const obj of this.objects) {
       if (obj.tick) {
         obj.tick()
       }
     }
+
+    for (const timer of this.timers) {
+      if (timer.nextTick === tick) {
+        timer.callback()
+        timer.nextTick = timer.getNextTick(this.currentTick)
+      }
+    }
+  }
+
+  addTimer(id: string, getNextTick: GetNextTick, callback: Callback) {
+    this.timers.push({
+      id,
+      getNextTick,
+      callback,
+      nextTick: getNextTick(this.currentTick),
+    })
   }
 
   draw() {
