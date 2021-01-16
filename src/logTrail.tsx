@@ -8,11 +8,11 @@ const LogTrail = ({ world }: { world: World }) => {
   }
 
   return (
-    <ul>
+    <ul class="log-trail">
       {world.log.getEntries().map((entry) => {
         return (
           <li>
-            {entry.objectType} {entry.id}: {entry.message}
+            {`${entry.objectType} ${entry.id}:`.padEnd(11, ' ')} {entry.message}
           </li>
         )
       })}

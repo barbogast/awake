@@ -15,6 +15,14 @@ canvas {
   flex-direction: row;
 }
 
+.log-trail {
+  height: 500px;
+  overflow-y: scroll;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  white-space: pre;
+}
+
 .pointer {
   cursor: pointer;
 }
