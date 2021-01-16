@@ -47,6 +47,7 @@ let world: World
 let state = 'initial'
 let ctx1
 let ctx2
+let tick
 let callback
 
 function setup() {
@@ -57,6 +58,7 @@ function setup() {
 }
 
 function resetSimuliation() {
+  tick = 0
   world = new World(ctx1, ctx2)
   const home = new House(new Pos(50, 50), world)
   const person1 = new Person(new Pos(50, 50), world)
@@ -79,16 +81,18 @@ function renderLoop() {
     return
   }
 
+  tick += 1
   clearUi()
   world.tick()
   world.draw()
-  callback()
+
+  callback(tick)
   requestAnimationFrame(renderLoop)
 }
 
 const App = () => {
   const [counter, setCounter] = useState(0)
-  callback = () => setCounter((c) => c + 1)
+  callback = setCounter
 
   useEffect(() => {
     setup()
@@ -136,7 +140,7 @@ const App = () => {
         </div>
         <LogTrail world={world} />
       </div>
-      Frame: {counter}
+      Tick: {counter}
       <br />
       {world && <Dashboard world={world} />}
     </div>
