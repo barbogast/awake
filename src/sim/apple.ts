@@ -26,6 +26,12 @@ class Apple implements Object1 {
     return h
   }
 
+  takeBite(size: number) {
+    const bite = Math.min(this.energy, size)
+    this.energy -= bite
+    return bite
+  }
+
   debugInfo() {
     return this.toString()
   }

@@ -5,10 +5,146 @@ import World from './world.js'
 import { ObjectType, Object1, LoggingFunction } from '../types.js'
 import { drawCircle } from './utils.js'
 import Pear from './pear.js'
+import planner from './planner.js'
+const x = planner
 
 const EAT_WHEN_LESS_THEN = 500
 const MAX_ENERGY = 1000
 const INITIAL_ENERGY = 750
+const EAT_PER_TICK = 100
+
+// const eating = () => {
+//   // getFood
+//   lookForFruit()
+//   if (fruitFoundOnFloor){
+//     walkTo(fruit)
+//     putFruitToInventory()
+//   } else if(fruitFoundInStore) {
+//     walkTo(store)
+//     takeFruitFromStore()
+//     putFruitIntoInventory()
+//   } else {
+//     wait()
+//   }
+
+//   if(fruitInInventory and energyNotFull){
+//     eatFromFruitInInventory()
+//     if(energyFull or fruitEmpty){
+//       emptyInventory()
+//       done()
+//     }
+//   }
+// }
+
+// const harvest = () => {
+//   lookForFruit()
+//   if (fruitFoundOnFloor){
+//     walkTo(fruit)
+//     putFruitToInventory()
+//     walkTo(Store)
+//     putFruitToStore()
+//   }
+//   done()
+// }
+
+// const eating = [
+//   'lookingForFruit'
+// ]
+
+// let tasks = ''
+// const x = {
+//   eat: () => {
+//     if(!this.inventory){
+//       tasks += 'getFruit'
+//     }
+//   },
+
+//   getFruit: () => {
+//     if(!this.target){
+//       tasks += 'lookForFruit'
+//     }
+
+//     if(!this.inventory){
+//       tasks += 'pickupFruit'
+//     }
+//   },
+//   lookForFruit: () => {
+//     // if(this.inventory){
+//     //   tasks += ''
+//     // }
+
+//     const fruit = World.findPos(['Apple', 'Grape'])
+//     if(fruit){
+//       tasks += `walkTo(${fruit.id})`
+//     } else {
+//       const store = World.findPos(['Store'])
+//       tasks += `walkTo(${store.id})`
+//     }
+//   }
+// }
+
+// const eat = [
+//   {
+//     name: 'walkTo',
+//     args: ['position'],
+//   },
+//   {
+//     name: 'takeFruitToInventory',
+//     results: ['success', 'fruitGone'],
+//   },
+//   {
+//     name: 'collectFruitFromGround',
+//     returns: ['success', 'failure'],
+//     tasks: [
+//       'walkTo',
+//       [
+//         'takeFruitToInventory', {
+//           'success': { 'return': 'success'},
+//           'fruitGone': {'return': 'failure'}
+//         }
+//       ]
+//     ]
+//   },
+//   {
+//     name: 'findFruit',
+//     returns: ['ground', 'store'],
+//   },
+//   {
+//     name: 'getFruit',
+//     tasks: [
+//       [
+//         'findFruit', {
+//           'ground': 'collectFruitFromGround'
+//         }
+//       ]
+//     ],
+
+//   },
+//   {
+//     'task': 'lookForFruit',
+//     'result': {
+//       'ground': [
+//         {
+//           'task': 'walkTo',
+//         },
+//         {
+//           'task': 'takeFruitToInventory',
+//           'result': {
+//             'success': [],
+//             'fruitGone': ['lookForFruit']
+//           }
+//         }
+//       ],
+//       'store': [],
+//       'notFound': [],
+//     }
+//   }
+// ]
+
+// function collectFruit(pos){
+//   this.addSubroutine('walkTo', pos)
+
+// }
 
 class Person implements Object1 {
   type = 'Person'
@@ -20,12 +156,16 @@ class Person implements Object1 {
   id!: string
   log!: LoggingFunction
   energy: number
+  isEating: boolean
+  occupation: string
 
   constructor(pos: Pos, world: World) {
     this.pos = pos
     this.world = world
     this.inventory = undefined
     this.energy = INITIAL_ENERGY
+    this.isEating = false
+    this.currentTask = undefined
   }
 
   setTarget(types: ObjectType[]) {
@@ -39,22 +179,38 @@ class Person implements Object1 {
     }
   }
 
+  getNextTask() {
+    if (this.energy < EAT_WHEN_LESS_THEN) {
+      return 'eating'
+    } else {
+      return 'harvesting'
+    }
+  }
+
   tick() {
     if (this.energy <= 0) {
       return
     }
 
+    switch (this.occupation) {
+      case 'harvesting': {
+      }
+
+      case 'eating': {
+      }
+    }
+
     this.energy -= 1
 
-    if (this.energy < EAT_WHEN_LESS_THEN) {
+    if (this.isEating) {
+      this.takeBite()
+    } else if (this.energy < EAT_WHEN_LESS_THEN) {
       if (
         this.inventory &&
         (this.inventory.type === 'Apple' || this.inventory.type === 'Pear')
       ) {
-        this.eat(this.inventory)
-        this.inventory = undefined
-        this.setTarget(['Apple', 'Pear'])
-      } else if (this.target?.type === 'House') {
+        this.eat()
+      } else if (this.target?.type !== 'House') {
         this.setTarget(['House'])
       }
     }
@@ -70,12 +226,19 @@ class Person implements Object1 {
     }
   }
 
-  eat(obj: Object1) {
-    this.log(`Eat ${obj}`)
-    this.energy = Math.min(
-      this.energy + (obj as Apple | Pear).energy,
-      MAX_ENERGY,
-    )
+  eat() {
+    this.log(`Eat ${this.inventory}`)
+    this.isEating = true
+  }
+
+  takeBite() {
+    const fruit = this.inventory as Apple | Pear
+    const bite = fruit.takeBite(EAT_PER_TICK)
+    this.energy = Math.min(this.energy + bite, MAX_ENERGY)
+    if (this.energy === MAX_ENERGY) {
+      this.isEating = false
+      this.inventory = undefined // There might be some left. Let's throw it away anyawy
+    }
   }
 
   moveTowards() {
@@ -148,8 +311,8 @@ class Person implements Object1 {
             [],
           )
           if (obj) {
-            this.eat(obj)
-            this.setTarget(['Apple', 'Pear'])
+            this.inventory = obj
+            this.eat()
           }
           return
         }
